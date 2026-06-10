@@ -61,13 +61,10 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString(),
     };
 
-    void Promise.all([
+    await Promise.all([
       saveDebateMessage({ sessionId: body.sessionId, message: body.message }),
       saveDebateMessage({ sessionId: body.sessionId, message: aiMessage }),
-    ]).catch((error) => {
-      const message = error instanceof Error ? error.message : "Unknown Supabase save error.";
-      console.warn("Failed to save chat messages:", message);
-    });
+    ]);
 
     return NextResponse.json({ message: aiMessage, model: AI_MODEL });
   } catch (error) {

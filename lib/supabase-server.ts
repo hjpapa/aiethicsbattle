@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type {
   DebateMessage,
@@ -12,7 +13,10 @@ let supabaseServerClient: SupabaseClient | null = null;
 export function getSupabaseServerClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key =
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    process.env.SUPABASE_SECRET_KEY ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !key) {
     return null;
@@ -39,23 +43,21 @@ export async function createDebateSession(setup: Required<Pick<
     return undefined;
   }
 
-  const { data, error } = await supabase
-    .from("debate_sessions")
-    .insert({
-      user_type: setup.userType,
-      bot_type: setup.botType,
-      student_level: setup.studentLevel,
-      topic_id: setup.topicId,
-    })
-    .select("id")
-    .single();
+  const sessionId = randomUUID();
+  const { error } = await supabase.from("debate_sessions").insert({
+    id: sessionId,
+    user_type: setup.userType,
+    bot_type: setup.botType,
+    student_level: setup.studentLevel,
+    topic_id: setup.topicId,
+  });
 
   if (error) {
     console.warn("Failed to create Supabase debate session:", error.message);
     return undefined;
   }
 
-  return data?.id as string | undefined;
+  return sessionId;
 }
 
 export async function saveDebateMessage({
