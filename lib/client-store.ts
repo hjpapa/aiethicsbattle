@@ -4,7 +4,7 @@ import type { DebateMessage, DebateSetup, ReviewResult } from "@/types/debate";
 
 const SETUP_KEY = "ai-ethics-debate-setup";
 const MESSAGES_KEY = "ai-ethics-debate-messages";
-const REVIEW_KEY = "ai-ethics-debate-review";
+const REVIEW_KEY = "ai-ethics-debate-review-v2";
 
 function readJson<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") {

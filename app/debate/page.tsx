@@ -14,6 +14,9 @@ import {
   setStoredReview,
 } from "@/lib/client-store";
 import {
+  MAX_BLACK_MOVES,
+  MIN_BLACK_MOVES_FOR_REVIEW,
+  countBlackMoves,
   createMessage,
   getEthicsTypeByCode,
   getNextBlackStage,
@@ -80,8 +83,19 @@ export default function DebatePage() {
     };
   }, [readySetup]);
 
+  const blackMoveCount = countBlackMoves(messages);
+  const debateComplete = blackMoveCount >= MAX_BLACK_MOVES;
+  const reviewReady = blackMoveCount >= MIN_BLACK_MOVES_FOR_REVIEW;
+
   async function submitMove() {
-    if (!readySetup?.studentLevel || !userType || !botType || !topic || !input.trim()) {
+    if (
+      !readySetup?.studentLevel ||
+      !userType ||
+      !botType ||
+      !topic ||
+      !input.trim() ||
+      debateComplete
+    ) {
       return;
     }
 
@@ -107,17 +121,34 @@ export default function DebatePage() {
         }),
       });
 
-      const data = (await response.json()) as { message?: DebateMessage; error?: string };
+      const data = (await response.json()) as {
+        message?: DebateMessage;
+        acceptedMessage?: DebateMessage;
+        countsAsMove?: boolean;
+        error?: string;
+      };
       if (!response.ok || !data.message) {
         throw new Error(data.error || "백돌 응수 생성에 실패했습니다.");
       }
 
-      const finalMessages = [...nextMessages, data.message];
+      const acceptedMessage = data.acceptedMessage ?? blackMessage;
+      const finalMessages = [...messages, acceptedMessage, data.message];
       setMessages(finalMessages);
       setStoredMessages(finalMessages);
-      setStatus("다음 착수를 이어갈 수 있습니다.");
+      if (data.countsAsMove === false) {
+        setStatus("대국 방법을 안내했어요. 이번 입력은 착수 횟수에 포함되지 않습니다.");
+      } else {
+        setStatus(
+          blackMoveCount + 1 >= MAX_BLACK_MOVES
+            ? "다섯 번의 착수를 마쳤습니다. 이제 복기로 생각을 정리해 보세요."
+            : "백돌의 질문을 보고 다음 생각을 보완해 보세요.",
+        );
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
+      setMessages(messages);
+      setStoredMessages(messages);
+      setInput(blackMessage.content);
       setStatus(message);
     } finally {
       setBusy(false);
@@ -126,7 +157,7 @@ export default function DebatePage() {
   }
 
   async function requestJudgement() {
-    if (!readySetup?.studentLevel || !topic || messages.length < 2) {
+    if (!readySetup?.studentLevel || !topic || blackMoveCount < 1) {
       return;
     }
 
@@ -162,7 +193,7 @@ export default function DebatePage() {
   }
 
   async function requestReview() {
-    if (!readySetup?.studentLevel || !messages.length) {
+    if (!readySetup?.studentLevel || !reviewReady) {
       return;
     }
 
@@ -225,6 +256,10 @@ export default function DebatePage() {
         input={input}
         busy={busy}
         replying={replying}
+        blackMoveCount={blackMoveCount}
+        maxBlackMoves={MAX_BLACK_MOVES}
+        reviewReady={reviewReady}
+        debateComplete={debateComplete}
         status={status}
         onInput={setInput}
         onSubmit={submitMove}

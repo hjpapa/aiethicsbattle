@@ -51,7 +51,7 @@ export default function ReviewPage() {
     <main className="app-page">
       <section className="page-heading">
         <span className="app-kicker">대국 복기</span>
-        <h1>토론 복기</h1>
+        <h1>오늘의 흑백토론 복기</h1>
         {summary ? (
           <p>
             {summary.topic.title} · 흑돌 {summary.userType.stoneName} vs 백돌{" "}

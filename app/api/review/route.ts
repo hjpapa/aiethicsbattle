@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { getEthicsTypeByCode, getTopicById } from "@/lib/debate-engine";
+import {
+  MIN_BLACK_MOVES_FOR_REVIEW,
+  countBlackMoves,
+  getEthicsTypeByCode,
+  getTopicById,
+} from "@/lib/debate-engine";
 import { parseJsonObject } from "@/lib/json";
 import { AI_MODEL, generateAIText } from "@/lib/openai";
 import { buildReviewPrompt } from "@/lib/prompts";
@@ -7,12 +12,12 @@ import { isEthicsTypeCode, isStudentLevel, saveDebateReview } from "@/lib/supaba
 import type { DebateMessage, ReviewResult } from "@/types/debate";
 
 const fallbackReview: ReviewResult = {
-  blackMainClaim: "흑돌은 자신의 입장에서 중요한 가치를 제시했습니다.",
-  whiteMainCounter: "백돌은 반대편 가치와 기준을 물었습니다.",
-  strongestConflict: "인간존엄성, 사회공공성, 기술합목적성 중 무엇을 우선할지의 충돌입니다.",
-  blackStrength: "자기 생각을 직접 말하며 토론에 참여했습니다.",
-  nextPerspective: "상대 입장에서 가장 걱정하는 피해가 무엇인지 더 생각해 볼 수 있습니다.",
-  growthSentence: "좋은 토론은 이기는 것이 아니라 기준을 더 선명하게 만드는 과정입니다.",
+  initialThought: "흑돌은 자신의 입장에서 중요한 생각과 이유를 말했습니다.",
+  whitePerspective: "백돌은 같은 문제를 다른 사람과 가치의 입장에서 살펴보게 했습니다.",
+  valueConflict: "AI의 도움과 사람의 권리, 모두의 안전 중 무엇을 함께 지킬지 생각했습니다.",
+  addedCondition: "AI를 사용할 때 필요한 제한과 사람의 확인 절차를 더 생각했습니다.",
+  responsiblePromise: "AI의 판단만 믿지 않고 사람에게 미칠 영향을 함께 살피겠습니다.",
+  reflectionSentence: "AI의 도움을 활용하면서도 사람의 권리와 마음을 함께 지켜야 합니다.",
 };
 
 export async function POST(request: Request) {
@@ -33,6 +38,13 @@ export async function POST(request: Request) {
   const botType = getEthicsTypeByCode(body.botType);
   const topic = getTopicById(body.topicId);
   const history = body.history as DebateMessage[];
+
+  if (countBlackMoves(history) < MIN_BLACK_MOVES_FOR_REVIEW) {
+    return NextResponse.json(
+      { error: "다섯 번 착수한 뒤 복기를 만들 수 있습니다." },
+      { status: 400 },
+    );
+  }
 
   try {
     const raw = await generateAIText({

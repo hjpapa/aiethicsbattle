@@ -16,6 +16,17 @@ export type EthicsCoreValue =
 
 export type StudentLevel = "elementary" | "middle" | "high";
 
+export type LearningStage =
+  | "dilemma_setting"
+  | "situation_perception"
+  | "consequence_prediction"
+  | "empathy_perception"
+  | "position_selection"
+  | "opposing_argument"
+  | "position_revision"
+  | "responsibility_commitment"
+  | "review";
+
 export type DebateStage =
   | "opening"
   | "black_first_move"
@@ -26,6 +37,7 @@ export type DebateStage =
   | "review";
 
 export type MessageRole = "black" | "white" | "system";
+export type DebateMessageKind = "move" | "guidance";
 
 export interface EthicsType {
   code: EthicsTypeCode;
@@ -44,7 +56,16 @@ export interface DebateTopic {
   title: string;
   subtitle: string;
   description: string;
+  dilemmaNarrative: string;
+  dilemmaChoiceA: string;
+  dilemmaChoiceB: string;
   relatedValues: EthicsCoreValue[];
+  relatedRequirements: string[];
+  stakeholders: string[];
+  expectedPositiveConsequences: string[];
+  expectedNegativeConsequences: string[];
+  empathyTargets: string[];
+  responsibilityQuestion: string;
   blackPrompt: string;
 }
 
@@ -53,6 +74,7 @@ export interface DebateMessage {
   role: MessageRole;
   content: string;
   stage: DebateStage;
+  kind?: DebateMessageKind;
   createdAt: string;
 }
 
@@ -76,12 +98,12 @@ export interface JudgementResult {
 }
 
 export interface ReviewResult {
-  blackMainClaim: string;
-  whiteMainCounter: string;
-  strongestConflict: string;
-  blackStrength: string;
-  nextPerspective: string;
-  growthSentence: string;
+  initialThought: string;
+  whitePerspective: string;
+  valueConflict: string;
+  addedCondition: string;
+  responsiblePromise: string;
+  reflectionSentence: string;
 }
 
 export interface DebateSetup {

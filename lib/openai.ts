@@ -61,11 +61,17 @@ export async function generateAIText({
   input,
   maxOutputTokens = 900,
   verbosity = "low",
+  jsonSchema,
 }: {
   instructions: string;
   input: string;
   maxOutputTokens?: number;
   verbosity?: "low" | "medium" | "high";
+  jsonSchema?: {
+    name: string;
+    description?: string;
+    schema: Record<string, unknown>;
+  };
 }) {
   const reasoning = getFastReasoningConfig(AI_MODEL);
 
@@ -76,18 +82,31 @@ export async function generateAIText({
       input,
       max_output_tokens: tokenBudget,
       store: false,
-      text: { verbosity },
+      text: {
+        verbosity,
+        ...(jsonSchema
+          ? {
+              format: {
+                type: "json_schema" as const,
+                name: jsonSchema.name,
+                description: jsonSchema.description,
+                schema: jsonSchema.schema,
+                strict: true,
+              },
+            }
+          : {}),
+      },
       ...(reasoning ? { reasoning } : {}),
     });
   }
 
   const firstResponse = await createResponse(maxOutputTokens);
   const firstText = extractResponseText(firstResponse);
-  if (firstText) {
+  if (firstText && firstResponse.status !== "incomplete") {
     return firstText;
   }
 
-  console.warn("OpenAI response had no output text; retrying with larger budget.", {
+  console.warn("OpenAI response was empty or incomplete; retrying with larger budget.", {
     model: AI_MODEL,
     status: firstResponse.status,
     incompleteReason: firstResponse.incomplete_details?.reason,
@@ -96,7 +115,7 @@ export async function generateAIText({
 
   const retryResponse = await createResponse(Math.max(maxOutputTokens * 2, 1600));
   const retryText = extractResponseText(retryResponse);
-  if (retryText) {
+  if (retryText && retryResponse.status !== "incomplete") {
     return retryText;
   }
 

@@ -8,6 +8,9 @@ import type {
   StudentLevel,
 } from "@/types/debate";
 
+export const MAX_BLACK_MOVES = 5;
+export const MIN_BLACK_MOVES_FOR_REVIEW = 5;
+
 export const oppositeEthicsTypeMap: Record<EthicsTypeCode, EthicsTypeCode> = {
   HSH: "STT",
   HTH: "SST",
@@ -26,9 +29,9 @@ export const levelLabels: Record<StudentLevel, string> = {
 };
 
 export const levelDescriptions: Record<StudentLevel, string> = {
-  elementary: "짧고 쉬운 문장, 생활 예시, 한 번에 하나의 질문",
-  middle: "주장과 근거 구분, 반론과 재반론, 가치 충돌 설명",
-  high: "권리 침해, 공익, 효율성, 판단 기준 같은 개념을 포함",
+  elementary: "초등 5·6학년 수준의 쉬운 설명, 생활 예시, 한 번에 하나의 질문",
+  middle: "주장과 근거, 원인과 결과, 판단 조건을 분명하게 연결",
+  high: "가치 충돌, 허용 기준, 책임 주체와 예외 조건까지 검토",
 };
 
 export function getEthicsTypeByCode(code: EthicsTypeCode) {
@@ -73,11 +76,17 @@ export function buildBlackOpeningGuide(userType: EthicsType) {
 }
 
 export function getNextBlackStage(messages: DebateMessage[]): DebateStage {
-  const blackMoves = messages.filter((message) => message.role === "black").length;
+  const blackMoves = countBlackMoves(messages);
   if (blackMoves === 0) {
     return "black_first_move";
   }
   return "black_counter";
+}
+
+export function countBlackMoves(messages: DebateMessage[]) {
+  return messages.filter(
+    (message) => message.role === "black" && message.kind !== "guidance",
+  ).length;
 }
 
 export function createMessage(
@@ -93,6 +102,7 @@ export function createMessage(
     role,
     content,
     stage,
+    kind: "move",
     createdAt: new Date().toISOString(),
   };
 }
@@ -100,8 +110,11 @@ export function createMessage(
 export function summarizeHistory(messages: DebateMessage[]) {
   return messages
     .map((message) => {
-      const roleLabel =
-        message.role === "black"
+      const roleLabel = message.kind === "guidance"
+        ? message.role === "black"
+          ? "흑돌의 대국 질문"
+          : "백돌의 대국 안내"
+        : message.role === "black"
           ? "흑돌 학생"
           : message.role === "white"
             ? "백돌 AI"
