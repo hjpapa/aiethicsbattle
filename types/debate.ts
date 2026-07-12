@@ -98,12 +98,19 @@ export interface JudgementResult {
 }
 
 export interface ReviewResult {
+  closingMessage: string;
   initialThought: string;
+  finalThought: string;
+  blackArguments: string[];
   whitePerspective: string;
   valueConflict: string;
   addedCondition: string;
+  goodMove: string;
+  unresolvedIssue: string;
+  responsibleConditions: string[];
   responsiblePromise: string;
   reflectionSentence: string;
+  finalMessage: string;
 }
 
 export interface DebateSetup {

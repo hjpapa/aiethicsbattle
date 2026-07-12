@@ -15,8 +15,6 @@ import { buildChatInput, buildDebateInstructions } from "@/lib/prompts";
 import { isEthicsTypeCode, isStudentLevel, saveDebateMessage } from "@/lib/supabase-server";
 import type { DebateMessage, StudentLevel } from "@/types/debate";
 
-const CHAT_HISTORY_LIMIT = 10;
-
 const replyTokenBudget = {
   elementary: 1400,
   middle: 1600,
@@ -126,8 +124,6 @@ export async function POST(request: Request) {
   const topic = getTopicById(body.topicId);
   const studentLevel = body.studentLevel as StudentLevel;
   const whiteStage = body.message.stage === "black_counter" ? "white_counter" : "white_response";
-  const recentHistory = history.slice(-CHAT_HISTORY_LIMIT);
-
   if (needsImmediateDebateGuidance(body.message.content)) {
     return createGuidanceResult({
       body,
@@ -146,7 +142,7 @@ export async function POST(request: Request) {
       }),
       input: buildChatInput({
         userMessage: body.message.content,
-        history: recentHistory,
+        history,
         moveNumber: countBlackMoves(history) + 1,
       }),
       maxOutputTokens: replyTokenBudget[studentLevel],

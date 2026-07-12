@@ -887,6 +887,15 @@ textarea:focus-visible {
   gap: 14px;
 }
 
+.review-panel__closing {
+  padding: 16px 18px;
+  border-left: 4px solid var(--accent);
+  border-radius: 6px;
+  color: #334047;
+  background: var(--accent-soft);
+  line-height: 1.65;
+}
+
 .review-panel__growth {
   display: flex;
   align-items: center;
