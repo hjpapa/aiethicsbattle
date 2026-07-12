@@ -716,54 +716,6 @@ textarea:focus-visible {
   background: #fbfcfb;
 }
 
-.sentence-starters {
-  display: grid;
-  gap: 10px;
-  padding: 12px 14px 0;
-}
-
-.sentence-starters__heading {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.sentence-starters__heading strong {
-  font-size: 0.82rem;
-  font-weight: 900;
-}
-
-.sentence-starters__heading span {
-  color: var(--muted);
-  font-size: 0.76rem;
-}
-
-.sentence-starters__list {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 2px;
-}
-
-.sentence-starters__list button {
-  flex: 1 0 240px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 9px 11px;
-  color: #3d4950;
-  background: var(--surface);
-  font-size: 0.78rem;
-  line-height: 1.45;
-  text-align: left;
-  cursor: pointer;
-}
-
-.sentence-starters__list button:hover {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-}
-
 .move-form {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -1071,8 +1023,7 @@ textarea:focus-visible {
     grid-template-columns: 1fr;
   }
 
-  .debate-complete,
-  .sentence-starters__heading {
+  .debate-complete {
     align-items: stretch;
     flex-direction: column;
   }

@@ -95,12 +95,11 @@ export function DebateBoard({
         </div>
 
         <footer className="move-composer">
-          <SentenceStarters moveNumber={blackMoveCount + 1} onSelect={onInput} />
           <div className="move-form">
             <textarea
               value={input}
               onChange={(event) => onInput(event.target.value)}
-              placeholder="문장 틀을 눌러 시작하거나, 내 생각을 직접 적어 보세요."
+              placeholder="내 생각과 그 이유를 자유롭게 적어 보세요."
               rows={3}
               disabled={busy}
             />
@@ -130,55 +129,6 @@ export function DebateBoard({
         <ValueBadge value={botType.coreValue} compact />
       </aside>
     </section>
-  );
-}
-
-const sentenceStarters = {
-  1: [
-    "나는 __________라고 생각합니다.\n왜냐하면 __________ 때문입니다.",
-    "하지만 __________ 문제가 생길 수도 있습니다.",
-  ],
-  2: [
-    "그래서 __________ 조건이 필요하다고 생각합니다.",
-    "백돌의 말을 듣고 __________도 생각하게 되었습니다.",
-  ],
-  3: [
-    "이 선택으로 __________한 사람은 __________하게 느낄 것 같습니다.",
-    "__________의 입장에서 보면 __________도 중요합니다.",
-  ],
-  4: [
-    "그래서 내 생각에 __________ 조건을 추가하고 싶습니다.",
-    "__________인 경우에만 허용하고, __________은/는 사람이 확인해야 합니다.",
-  ],
-  5: [
-    "지금까지 생각해 보니 __________도 중요하고, __________ 조건도 필요합니다.",
-    "백돌의 질문에서 __________을/를 더 이야기해 보고 싶습니다.",
-  ],
-} as const;
-
-function SentenceStarters({
-  moveNumber,
-  onSelect,
-}: {
-  moveNumber: number;
-  onSelect: (value: string) => void;
-}) {
-  const starters = sentenceStarters[moveNumber as keyof typeof sentenceStarters] ?? sentenceStarters[5];
-
-  return (
-    <div className="sentence-starters">
-      <div className="sentence-starters__heading">
-        <strong>{moveNumber === 1 ? "첫 주장 문장 틀" : "생각 보완 문장 틀"}</strong>
-        <span>눌러서 시작해 보세요</span>
-      </div>
-      <div className="sentence-starters__list">
-        {starters.map((starter) => (
-          <button key={starter} type="button" onClick={() => onSelect(starter)}>
-            {starter.replace("\n", " ")}
-          </button>
-        ))}
-      </div>
-    </div>
   );
 }
 
