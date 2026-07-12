@@ -41,7 +41,7 @@ export async function POST(request: Request) {
 
   if (countBlackMoves(history) < MIN_BLACK_MOVES_FOR_REVIEW) {
     return NextResponse.json(
-      { error: "다섯 번 착수한 뒤 복기를 만들 수 있습니다." },
+      { error: "한 번 이상 착수한 뒤 토론을 끝낼 수 있습니다." },
       { status: 400 },
     );
   }

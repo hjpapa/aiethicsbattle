@@ -14,7 +14,6 @@ import {
   setStoredReview,
 } from "@/lib/client-store";
 import {
-  MAX_BLACK_MOVES,
   MIN_BLACK_MOVES_FOR_REVIEW,
   countBlackMoves,
   createMessage,
@@ -84,7 +83,6 @@ export default function DebatePage() {
   }, [readySetup]);
 
   const blackMoveCount = countBlackMoves(messages);
-  const debateComplete = blackMoveCount >= MAX_BLACK_MOVES;
   const reviewReady = blackMoveCount >= MIN_BLACK_MOVES_FOR_REVIEW;
 
   async function submitMove() {
@@ -93,8 +91,7 @@ export default function DebatePage() {
       !userType ||
       !botType ||
       !topic ||
-      !input.trim() ||
-      debateComplete
+      !input.trim()
     ) {
       return;
     }
@@ -138,11 +135,7 @@ export default function DebatePage() {
       if (data.countsAsMove === false) {
         setStatus("대국 방법을 안내했어요. 이번 입력은 착수 횟수에 포함되지 않습니다.");
       } else {
-        setStatus(
-          blackMoveCount + 1 >= MAX_BLACK_MOVES
-            ? "다섯 번의 착수를 마쳤습니다. 이제 복기로 생각을 정리해 보세요."
-            : "백돌의 질문을 보고 다음 생각을 보완해 보세요.",
-        );
+        setStatus("백돌의 질문을 보고 다음 생각을 보완하거나, 충분히 이야기했다면 토론을 끝내 보세요.");
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
@@ -257,9 +250,7 @@ export default function DebatePage() {
         busy={busy}
         replying={replying}
         blackMoveCount={blackMoveCount}
-        maxBlackMoves={MAX_BLACK_MOVES}
         reviewReady={reviewReady}
-        debateComplete={debateComplete}
         status={status}
         onInput={setInput}
         onSubmit={submitMove}

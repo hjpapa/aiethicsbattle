@@ -8,8 +8,7 @@ import type {
   StudentLevel,
 } from "@/types/debate";
 
-export const MAX_BLACK_MOVES = 5;
-export const MIN_BLACK_MOVES_FOR_REVIEW = 5;
+export const MIN_BLACK_MOVES_FOR_REVIEW = 1;
 
 export const oppositeEthicsTypeMap: Record<EthicsTypeCode, EthicsTypeCode> = {
   HSH: "STT",

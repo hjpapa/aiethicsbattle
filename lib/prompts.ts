@@ -1,5 +1,4 @@
 import {
-  MAX_BLACK_MOVES,
   getLevelLabel,
   levelDescriptions,
   summarizeHistory,
@@ -214,12 +213,12 @@ export function buildChatInput({
     2: "선택 뒤에 생길 일을 생각하는 데 도움이 될 수 있다.",
     3: "영향을 받는 사람의 마음을 생각하는 데 도움이 될 수 있다.",
     4: "허용 조건이나 예외를 구체화하는 데 도움이 될 수 있다.",
-    5: "마지막 입장과 스스로 지킬 약속을 정리하는 데 도움이 될 수 있다.",
+    5: "지금까지의 쟁점을 연결하고 판단 기준을 더 구체화하는 데 도움이 될 수 있다.",
   } as const;
   const phaseRule = phaseRules[moveNumber as keyof typeof phaseRules] ?? phaseRules[5];
 
   return `
-현재 흑돌 착수: ${moveNumber}번째 / 최대 ${MAX_BLACK_MOVES}번째
+현재 흑돌 착수: ${moveNumber}번째
 이번 수의 참고 관점: ${phaseRule}
 중요: 참고 관점은 학생의 새 착수와 자연스럽게 이어질 때만 사용한다. 맞지 않으면 직전 말에 답하는 것을 우선한다.
 

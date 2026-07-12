@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Loader2, RotateCcw, Save, Scale, Send } from "lucide-react";
+import { Flag, Loader2, RotateCcw, Scale, Send } from "lucide-react";
 import { ChatMessage } from "@/components/ChatMessage";
 import { StoneAvatar } from "@/components/StoneAvatar";
 import { ValueBadge } from "@/components/ValueBadge";
@@ -17,9 +17,7 @@ export function DebateBoard({
   busy,
   replying,
   blackMoveCount,
-  maxBlackMoves,
   reviewReady,
-  debateComplete,
   status,
   onInput,
   onSubmit,
@@ -35,9 +33,7 @@ export function DebateBoard({
   busy: boolean;
   replying: boolean;
   blackMoveCount: number;
-  maxBlackMoves: number;
   reviewReady: boolean;
-  debateComplete: boolean;
   status: string;
   onInput: (value: string) => void;
   onSubmit: () => void;
@@ -73,9 +69,6 @@ export function DebateBoard({
             <button className="icon-button" type="button" onClick={onJudge} disabled={busy || blackMoveCount < 1} aria-label="형세판단">
               <Scale size={18} />
             </button>
-            <button className="icon-button" type="button" onClick={onReview} disabled={busy || !reviewReady} aria-label="복기">
-              <Save size={18} />
-            </button>
             <button className="icon-button" type="button" onClick={onRestart} aria-label="처음으로">
               <RotateCcw size={18} />
             </button>
@@ -101,41 +94,31 @@ export function DebateBoard({
           )}
         </div>
 
-        {debateComplete ? (
-          <footer className="debate-complete">
-            <div>
-              <strong>다섯 번의 착수를 모두 마쳤어요.</strong>
-              <p>이제 승패 대신 내 생각에 더해진 조건과 약속을 복기해 보세요.</p>
-            </div>
-            <button className="primary-button" type="button" onClick={onReview} disabled={busy}>
-              {busy ? <Loader2 size={18} className="spin" /> : <Save size={18} />}
-              <span>복기 만들기</span>
-            </button>
-          </footer>
-        ) : (
-          <footer className="move-composer">
-            <SentenceStarters moveNumber={blackMoveCount + 1} onSelect={onInput} />
-            <div className="move-form">
-              <textarea
-                value={input}
-                onChange={(event) => onInput(event.target.value)}
-                placeholder="문장 틀을 눌러 시작하거나, 내 생각을 직접 적어 보세요."
-                rows={3}
-                disabled={busy}
-              />
+        <footer className="move-composer">
+          <SentenceStarters moveNumber={blackMoveCount + 1} onSelect={onInput} />
+          <div className="move-form">
+            <textarea
+              value={input}
+              onChange={(event) => onInput(event.target.value)}
+              placeholder="문장 틀을 눌러 시작하거나, 내 생각을 직접 적어 보세요."
+              rows={3}
+              disabled={busy}
+            />
+            <div className="move-form__actions">
               <button className="primary-button move-form__button" type="button" onClick={onSubmit} disabled={busy || !input.trim()}>
                 {busy ? <Loader2 size={18} className="spin" /> : <Send size={18} />}
                 <span>착수하기</span>
               </button>
+              <button className="secondary-button move-form__button" type="button" onClick={onReview} disabled={busy || !reviewReady}>
+                {busy ? <Loader2 size={18} className="spin" /> : <Flag size={18} />}
+                <span>토론 끝내기</span>
+              </button>
             </div>
-          </footer>
-        )}
-        <div className="board-progress" aria-label={`흑돌 착수 ${blackMoveCount}/${maxBlackMoves}`}>
+          </div>
+        </footer>
+        <div className="board-progress" aria-label={`흑돌 착수 ${blackMoveCount}회`}>
           <span>흑돌 착수</span>
-          {Array.from({ length: maxBlackMoves }, (_, index) => (
-            <i key={index} className={index < blackMoveCount ? "is-complete" : ""} />
-          ))}
-          <strong>{blackMoveCount}/{maxBlackMoves}</strong>
+          <strong>{blackMoveCount}회</strong>
         </div>
         <p className="board-status">{status}</p>
       </main>
@@ -168,8 +151,8 @@ const sentenceStarters = {
     "__________인 경우에만 허용하고, __________은/는 사람이 확인해야 합니다.",
   ],
   5: [
-    "내 최종 생각은 __________이고, __________ 조건이 꼭 필요합니다.",
-    "앞으로 AI를 사용할 때 __________을/를 조심하겠습니다.",
+    "지금까지 생각해 보니 __________도 중요하고, __________ 조건도 필요합니다.",
+    "백돌의 질문에서 __________을/를 더 이야기해 보고 싶습니다.",
   ],
 } as const;
 

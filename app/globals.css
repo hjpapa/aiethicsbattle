@@ -788,6 +788,11 @@ textarea:focus-visible {
   min-width: 132px;
 }
 
+.move-form__actions {
+  display: grid;
+  gap: 8px;
+}
+
 .debate-complete {
   display: flex;
   align-items: center;

@@ -1,7 +1,6 @@
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import {
-  MAX_BLACK_MOVES,
   countBlackMoves,
   getEthicsTypeByCode,
   getTopicById,
@@ -128,13 +127,6 @@ export async function POST(request: Request) {
   const studentLevel = body.studentLevel as StudentLevel;
   const whiteStage = body.message.stage === "black_counter" ? "white_counter" : "white_response";
   const recentHistory = history.slice(-CHAT_HISTORY_LIMIT);
-
-  if (countBlackMoves(history) >= MAX_BLACK_MOVES) {
-    return NextResponse.json(
-      { error: "토론은 다섯 번의 착수까지 진행할 수 있습니다. 이제 복기로 생각을 정리해 보세요." },
-      { status: 400 },
-    );
-  }
 
   if (needsImmediateDebateGuidance(body.message.content)) {
     return createGuidanceResult({
